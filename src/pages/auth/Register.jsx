@@ -16,6 +16,7 @@ export default function Register() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [role, setRole] = useState('siswa');
+  const [nis, setNis] = useState('');
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState({});
@@ -44,6 +45,9 @@ export default function Register() {
     } else if (password.length < 6) {
       newErrors.password = 'Password minimal 6 karakter';
     }
+    if (role === 'siswa' && !nis) {
+      newErrors.nis = 'NIS wajib diisi';
+    }
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -54,7 +58,7 @@ export default function Register() {
 
     setLoading(true);
     try {
-      const result = await register(email, password, nama, role);
+      const result = await register(email, password, nama, role, nis);
       if (result.requireApproval) {
         showToast('Pendaftaran berhasil! Akun Anda sedang menunggu persetujuan admin.', 'info');
         navigate('/login');
@@ -100,6 +104,25 @@ export default function Register() {
               className="text-white"
             />
           </div>
+
+          {role === 'siswa' && (
+            <div className="relative animate-fade-in">
+              <Input
+                id="nis"
+                type="text"
+                label="Nomor Induk Siswa (NIS)"
+                placeholder="Misal: 12345"
+                value={nis}
+                onChange={(e) => {
+                  setNis(e.target.value);
+                  if (errors.nis) setErrors({ ...errors, nis: '' });
+                }}
+                error={errors.nis}
+                required
+                className="text-white"
+              />
+            </div>
+          )}
 
           <div className="relative">
             <Input

@@ -120,7 +120,7 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const register = async (email, password, nama, role) => {
+  const register = async (email, password, nama, role, nis) => {
     setLoading(true);
     try {
       const userCredential = await fbCreateUser(auth, email, password);
@@ -132,11 +132,24 @@ export const AuthProvider = ({ children }) => {
         email: user.email,
         nama: nama,
         role: role,
-        status: status
+        status: status,
+        ...(role === 'siswa' && nis ? { nis } : {})
       };
 
       const userDocRef = doc(db, 'users', user.uid);
       await setDoc(userDocRef, defaultData);
+
+      // Create corresponding record in `siswa` collection if role is siswa
+      if (role === 'siswa') {
+        const siswaDocRef = doc(db, 'siswa', user.uid);
+        await setDoc(siswaDocRef, {
+          nis: nis,
+          nama: nama,
+          kelas: 'Belum Ditentukan',
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString()
+        });
+      }
 
       // If pending, sign out immediately
       if (status === 'pending') {
