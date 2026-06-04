@@ -12,7 +12,8 @@ import {
   Menu, 
   X,
   BookOpen,
-  Award
+  Award,
+  UserCheck
 } from 'lucide-react';
 
 export default function Sidebar() {
@@ -38,6 +39,7 @@ export default function Sidebar() {
           { to: '/admin/dashboard', label: 'Dashboard', icon: LayoutDashboard },
           { to: '/admin/siswa', label: 'Manajemen Siswa', icon: Users },
           { to: '/admin/guru', label: 'Manajemen Guru', icon: GraduationCap },
+          { to: '/admin/persetujuan-guru', label: 'Persetujuan Guru', icon: UserCheck },
           { to: '/admin/laporan', label: 'Laporan Nilai', icon: FileSpreadsheet },
         ];
       case 'guru':

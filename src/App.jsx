@@ -8,9 +8,11 @@ import Sidebar from './components/Sidebar';
 
 // Pages
 import Login from './pages/auth/Login';
+import Register from './pages/auth/Register';
 import AdminDashboard from './pages/admin/Dashboard';
 import AdminSiswa from './pages/admin/Siswa';
 import AdminGuru from './pages/admin/Guru';
+import AdminPersetujuanGuru from './pages/admin/PersetujuanGuru';
 import AdminLaporan from './pages/admin/Laporan';
 import GuruDashboard from './pages/guru/Dashboard';
 import GuruInputNilai from './pages/guru/InputNilai';
@@ -45,6 +47,7 @@ export default function App() {
             <Routes>
               {/* Public Auth Route */}
               <Route path="/login" element={<Login />} />
+              <Route path="/register" element={<Register />} />
 
               {/* Private Protected App Routes */}
               <Route element={
@@ -71,6 +74,11 @@ export default function App() {
                 <Route path="/admin/laporan" element={
                   <ProtectedRoute allowedRoles={['admin']}>
                     <AdminLaporan />
+                  </ProtectedRoute>
+                } />
+                <Route path="/admin/persetujuan-guru" element={
+                  <ProtectedRoute allowedRoles={['admin']}>
+                    <AdminPersetujuanGuru />
                   </ProtectedRoute>
                 } />
 
