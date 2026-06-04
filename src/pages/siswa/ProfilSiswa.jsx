@@ -109,14 +109,34 @@ export default function ProfilSiswa() {
             onChange={handleChange}
             required
           />
-          <Input
-            id="kelas"
-            name="kelas"
-            label="Kelas"
-            value={formData.kelas}
-            onChange={handleChange}
-            required
-          />
+          <div className="flex flex-col space-y-1.5 w-full">
+            <label className="text-xs font-semibold text-navy-800 flex items-center">
+              Kelas
+              <span className="text-rose-500 ml-0.5">*</span>
+            </label>
+            <select
+              id="kelas"
+              name="kelas"
+              value={formData.kelas}
+              onChange={handleChange}
+              required
+              className="w-full px-3.5 py-2 text-sm rounded-lg border bg-white text-navy-900 border-navy-200 focus:border-navy-500 focus:ring-navy-100 focus:ring-2 focus:ring-offset-0 transition-all duration-200 outline-none hover:border-navy-300"
+            >
+              <option value="">-- Pilih Kelas --</option>
+              <option value="X IPA 1">X IPA 1</option>
+              <option value="X IPA 2">X IPA 2</option>
+              <option value="X IPS 1">X IPS 1</option>
+              <option value="X IPS 2">X IPS 2</option>
+              <option value="XI IPA 1">XI IPA 1</option>
+              <option value="XI IPA 2">XI IPA 2</option>
+              <option value="XI IPS 1">XI IPS 1</option>
+              <option value="XI IPS 2">XI IPS 2</option>
+              <option value="XII IPA 1">XII IPA 1</option>
+              <option value="XII IPA 2">XII IPA 2</option>
+              <option value="XII IPS 1">XII IPS 1</option>
+              <option value="XII IPS 2">XII IPS 2</option>
+            </select>
+          </div>
 
           <div className="pt-4">
             <Button

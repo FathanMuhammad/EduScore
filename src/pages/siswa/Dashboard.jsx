@@ -1,5 +1,6 @@
 import React, { useMemo } from 'react';
 import { useAuth } from '../../context/AuthContext';
+import { useData } from '../../context/DataContext';
 import useNilai from '../../hooks/useNilai';
 import Card from '../../components/Card';
 import Badge from '../../components/Badge';
@@ -8,12 +9,15 @@ import { Award, BookOpen, GraduationCap, CheckCircle2, AlertTriangle, User } fro
 import { Link } from 'react-router-dom';
 
 export default function SiswaDashboard() {
-  const { userData } = useAuth();
+  const { userData, currentUser } = useAuth();
+  const { siswa } = useData();
   const { getNilaiBySiswaNis, loading } = useNilai();
 
-  const studentNis = userData?.nis || '12345';
-  const studentName = userData?.nama || 'Siswa';
-  const studentClass = userData?.kelas || 'XII-RPL-1';
+  const currentSiswa = siswa.find(s => s.id === currentUser?.uid) || {};
+  
+  const studentNis = currentSiswa.nis || userData?.nis || '';
+  const studentName = currentSiswa.nama || userData?.nama || 'Siswa';
+  const studentClass = currentSiswa.kelas || '';
 
   // Get student's grades
   const studentGrades = useMemo(() => {
@@ -57,10 +61,12 @@ export default function SiswaDashboard() {
             </div>
             <div>
               <h3 className="text-base font-extrabold text-navy-900">{studentName}</h3>
-              <p className="text-xs text-navy-500 font-medium">NIS: {studentNis}</p>
-              <span className="inline-block mt-3 px-3 py-1 bg-navy-800 text-white rounded-full text-xs font-bold">
-                Kelas {studentClass}
-              </span>
+              <p className="text-xs text-navy-500 font-medium">NIS: {studentNis || '-'}</p>
+              {studentClass && studentClass !== 'Belum Ditentukan' && (
+                <span className="inline-block mt-3 px-3 py-1 bg-navy-800 text-white rounded-full text-xs font-bold">
+                  Kelas {studentClass}
+                </span>
+              )}
             </div>
           </div>
         </Card>

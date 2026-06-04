@@ -16,9 +16,11 @@
   width: 6px;
   height: 6px;
 }
+
 ::-webkit-scrollbar-track {
   @apply bg-navy-50/50;
 }
+
 ::-webkit-scrollbar-thumb {
   @apply bg-navy-200 rounded-lg hover:bg-navy-300 transition-colors;
 }
@@ -29,6 +31,7 @@
     transform: translateX(100%);
     opacity: 0;
   }
+
   to {
     transform: translateX(0);
     opacity: 1;
@@ -40,6 +43,7 @@
     transform: translateY(-8px);
     opacity: 0;
   }
+
   to {
     transform: translateY(0);
     opacity: 1;
@@ -50,6 +54,7 @@
   from {
     opacity: 0;
   }
+
   to {
     opacity: 1;
   }
@@ -60,6 +65,7 @@
     transform: scale(0.95);
     opacity: 0;
   }
+
   to {
     transform: scale(1);
     opacity: 1;
@@ -89,12 +95,18 @@
     color: black !important;
     font-size: 12pt;
   }
-  
+
   .no-print {
     display: none !important;
   }
 
-  aside, nav, header, button, .toolbar, .search-bar, .pagination-controls {
+  aside,
+  nav,
+  header,
+  button,
+  .toolbar,
+  .search-bar,
+  .pagination-controls {
     display: none !important;
   }
 

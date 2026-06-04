@@ -113,7 +113,7 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const register = async (email, password, nama, role, nis, idGuru, mataPelajaran) => {
+  const register = async (email, password, nama, role, nis, kelas, idGuru, mataPelajaran) => {
     setLoading(true);
     try {
       const userCredential = await fbCreateUser(auth, email, password);
@@ -139,7 +139,7 @@ export const AuthProvider = ({ children }) => {
         await setDoc(siswaDocRef, {
           nis: nis,
           nama: nama,
-          kelas: 'Belum Ditentukan',
+          kelas: kelas || 'Belum Ditentukan',
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString()
         });

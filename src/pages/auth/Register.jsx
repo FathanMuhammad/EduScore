@@ -17,6 +17,7 @@ export default function Register() {
   const [password, setPassword] = useState('');
   const [role, setRole] = useState('siswa');
   const [nis, setNis] = useState('');
+  const [kelas, setKelas] = useState('');
   const [idGuru, setIdGuru] = useState('');
   const [mataPelajaran, setMataPelajaran] = useState('');
   const [loading, setLoading] = useState(false);
@@ -47,8 +48,9 @@ export default function Register() {
     } else if (password.length < 6) {
       newErrors.password = 'Password minimal 6 karakter';
     }
-    if (role === 'siswa' && !nis) {
-      newErrors.nis = 'NIS wajib diisi';
+    if (role === 'siswa') {
+      if (!nis) newErrors.nis = 'NIS wajib diisi';
+      if (!kelas) newErrors.kelas = 'Kelas wajib dipilih';
     }
     if (role === 'guru') {
       if (!idGuru) newErrors.idGuru = 'ID Guru wajib diisi';
@@ -64,7 +66,7 @@ export default function Register() {
 
     setLoading(true);
     try {
-      const result = await register(email, password, nama, role, nis, idGuru, mataPelajaran);
+      const result = await register(email, password, nama, role, nis, kelas, idGuru, mataPelajaran);
       if (result.requireApproval) {
         showToast('Pendaftaran berhasil! Akun Anda sedang menunggu persetujuan admin.', 'info');
         navigate('/login');
@@ -112,21 +114,63 @@ export default function Register() {
           </div>
 
           {role === 'siswa' && (
-            <div className="relative animate-fade-in">
-              <Input
-                id="nis"
-                type="text"
-                label="Nomor Induk Siswa (NIS)"
-                placeholder="Misal: 12345"
-                value={nis}
-                onChange={(e) => {
-                  setNis(e.target.value);
-                  if (errors.nis) setErrors({ ...errors, nis: '' });
-                }}
-                error={errors.nis}
-                required
-                className="text-white"
-              />
+            <div className="grid grid-cols-2 gap-4 animate-fade-in">
+              <div className="relative">
+                <Input
+                  id="nis"
+                  type="text"
+                  label="Nomor Induk Siswa (NIS)"
+                  placeholder="Misal: 12345"
+                  value={nis}
+                  onChange={(e) => {
+                    setNis(e.target.value);
+                    if (errors.nis) setErrors({ ...errors, nis: '' });
+                  }}
+                  error={errors.nis}
+                  required
+                  className="text-white"
+                />
+              </div>
+              <div className="flex flex-col space-y-1.5 w-full">
+                <label className="text-xs font-semibold text-white flex items-center">
+                  Kelas
+                  <span className="text-rose-500 ml-0.5">*</span>
+                </label>
+                <select
+                  id="kelas"
+                  name="kelas"
+                  value={kelas}
+                  onChange={(e) => {
+                    setKelas(e.target.value);
+                    if (errors.kelas) setErrors({ ...errors, kelas: '' });
+                  }}
+                  required
+                  className={`
+                    w-full px-3.5 py-2 text-sm rounded-lg border bg-navy-900/40 text-white transition-all duration-200 outline-none
+                    focus:ring-2 focus:ring-offset-0 hover:bg-navy-800/60
+                    ${errors.kelas ? 'border-rose-300 focus:border-rose-500 focus:ring-rose-200' : 'border-white/20 focus:border-white/50 focus:ring-white/10'}
+                  `}
+                >
+                  <option value="" className="text-navy-900">-- Pilih Kelas --</option>
+                  <option value="X IPA 1" className="text-navy-900">X IPA 1</option>
+                  <option value="X IPA 2" className="text-navy-900">X IPA 2</option>
+                  <option value="X IPS 1" className="text-navy-900">X IPS 1</option>
+                  <option value="X IPS 2" className="text-navy-900">X IPS 2</option>
+                  <option value="XI IPA 1" className="text-navy-900">XI IPA 1</option>
+                  <option value="XI IPA 2" className="text-navy-900">XI IPA 2</option>
+                  <option value="XI IPS 1" className="text-navy-900">XI IPS 1</option>
+                  <option value="XI IPS 2" className="text-navy-900">XI IPS 2</option>
+                  <option value="XII IPA 1" className="text-navy-900">XII IPA 1</option>
+                  <option value="XII IPA 2" className="text-navy-900">XII IPA 2</option>
+                  <option value="XII IPS 1" className="text-navy-900">XII IPS 1</option>
+                  <option value="XII IPS 2" className="text-navy-900">XII IPS 2</option>
+                </select>
+                {errors.kelas && (
+                  <span className="text-xs font-medium text-rose-400">
+                    {errors.kelas}
+                  </span>
+                )}
+              </div>
             </div>
           )}
 
