@@ -118,7 +118,7 @@ export default function AdminDashboard() {
               <div className="flex items-center justify-between border-b border-navy-50 pb-2">
                 <div className="flex items-center space-x-2">
                   <span className="w-3.5 h-3.5 rounded bg-rose-500" />
-                  <span className="text-xs font-semibold text-navy-700">Tidak Lulus (< 70)</span>
+                  <span className="text-xs font-semibold text-navy-700">Tidak Lulus (&lt; 70)</span>
                 </div>
                 <span className="text-sm font-bold text-navy-900">{stats.tidakLulus} Siswa</span>
               </div>
