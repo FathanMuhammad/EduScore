@@ -63,11 +63,6 @@ export default function Login() {
     }
   };
 
-  const handleQuickLogin = (quickEmail) => {
-    setEmail(quickEmail);
-    setPassword('password123');
-  };
-
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-navy-900 via-navy-800 to-slate-900 p-4 font-sans">
       <div className="w-full max-w-md bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl shadow-2xl p-8 transition-all duration-300">
