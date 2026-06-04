@@ -13,7 +13,8 @@ import {
   X,
   BookOpen,
   Award,
-  UserCheck
+  UserCheck,
+  User
 } from 'lucide-react';
 
 export default function Sidebar() {
@@ -52,6 +53,7 @@ export default function Sidebar() {
         return [
           { to: '/siswa/dashboard', label: 'Dashboard Siswa', icon: LayoutDashboard },
           { to: '/siswa/nilai-pribadi', label: 'Nilai Pribadi', icon: Award },
+          { to: '/siswa/profil', label: 'Profil Saya', icon: User },
         ];
       default:
         return [];

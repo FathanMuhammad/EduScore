@@ -19,6 +19,8 @@ export default function SiswaNilaiPribadi() {
     return getNilaiBySiswaNis(studentNis);
   }, [getNilaiBySiswaNis, studentNis]);
 
+  // FIX: Menambahkan deklarasi variabel 'const columns =' yang sempat hilang
+  const columns = [
     { key: 'no', label: 'No', sortable: false },
     { key: 'mataPelajaran', label: 'Mata Pelajaran', sortable: true },
     { key: 'namaGuru', label: 'Guru Pengampu', sortable: true },

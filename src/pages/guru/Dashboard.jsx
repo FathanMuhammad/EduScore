@@ -1,5 +1,6 @@
 import React, { useMemo } from 'react';
 import { useAuth } from '../../context/AuthContext';
+import { useData } from '../../context/DataContext';
 import useNilai from '../../hooks/useNilai';
 import Card from '../../components/Card';
 import Badge from '../../components/Badge';
@@ -9,9 +10,10 @@ import { Link } from 'react-router-dom';
 
 export default function GuruDashboard() {
   const { userData } = useAuth();
+  const { siswa } = useData();
   const { getNilaiByGuru, loading } = useNilai();
 
-  const teacherId = userData?.idGuru || 'g1'; // default/fallback for mock
+  const teacherId = userData?.idGuru || 'g1'; 
   const teacherName = userData?.nama || 'Guru';
   const teacherSubject = userData?.mataPelajaran || 'Matematika';
 
@@ -113,15 +115,10 @@ export default function GuruDashboard() {
         </Card>
       </div>
 
-      {/* Recent Grades Box */}
+      {/* Students List Box */}
       <Card 
-        title="Daftar Nilai Mapel Terbaru" 
-        subtitle="Daftar nilai terakhir yang dimasukkan oleh Anda."
-        action={
-          <Link to="/guru/rekap" className="text-xs font-bold text-navy-800 hover:text-navy-950 hover:underline">
-            Lihat Rekap Lengkap
-          </Link>
-        }
+        title="Daftar Siswa" 
+        subtitle="Pilih siswa untuk memasukkan nilai mata pelajaran Anda."
       >
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm border-collapse">
@@ -130,50 +127,34 @@ export default function GuruDashboard() {
                 <th className="py-3 font-bold uppercase text-[10px] tracking-wider">NIS</th>
                 <th className="py-3 font-bold uppercase text-[10px] tracking-wider">Nama Siswa</th>
                 <th className="py-3 font-bold uppercase text-[10px] tracking-wider">Kelas</th>
-                <th className="py-3 font-bold uppercase text-[10px] tracking-wider text-center">Nilai Akhir</th>
-                <th className="py-3 font-bold uppercase text-[10px] tracking-wider text-center">Status Kelulusan</th>
-                <th className="py-3 font-bold uppercase text-[10px] tracking-wider text-center">Validasi</th>
+                <th className="py-3 font-bold uppercase text-[10px] tracking-wider text-right">Aksi</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-navy-50">
-              {teacherGrades.length > 0 ? (
-                teacherGrades.slice(0, 5).map((grade) => (
-                  <tr key={grade.id} className="hover:bg-navy-50/20 transition-colors">
-                    <td className="py-3.5 font-bold text-navy-800">{grade.nis}</td>
-                    <td className="py-3.5 font-semibold text-navy-900">{grade.namaSiswa}</td>
-                    <td className="py-3.5 text-navy-600">{grade.kelas}</td>
-                    <td className="py-3.5 font-bold text-center text-navy-800">{grade.nilaiAkhir}</td>
-                    <td className="py-3.5 text-center">
-                      <Badge status={grade.status} />
-                    </td>
-                    <td className="py-3.5 text-center">
-                      <span className={`
-                        inline-block px-2 py-0.5 rounded text-[10px] font-bold border
-                        ${grade.isValidated 
-                          ? 'bg-emerald-50 text-emerald-700 border-emerald-200' 
-                          : 'bg-rose-50 text-rose-700 border-rose-200'}
-                      `}>
-                        {grade.isValidated ? 'Valid' : 'Pending'}
-                      </span>
+              {siswa && siswa.length > 0 ? (
+                siswa.map((s) => (
+                  <tr key={s.id} className="hover:bg-navy-50/20 transition-colors">
+                    <td className="py-3.5 font-bold text-navy-800">{s.nis || 'N/A'}</td>
+                    <td className="py-3.5 font-semibold text-navy-900">{s.nama}</td>
+                    <td className="py-3.5 text-navy-600">{s.kelas || 'Belum Ditentukan'}</td>
+                    <td className="py-3.5 text-right">
+                      <Link to={`/guru/input-nilai?nis=${s.nis || ''}&nama=${encodeURIComponent(s.nama || '')}`}>
+                        <button className="bg-emerald-600 text-white font-bold text-xs px-3 py-1.5 rounded hover:bg-emerald-700 transition-all">
+                          Tambah Nilai
+                        </button>
+                      </Link>
                     </td>
                   </tr>
                 ))
               ) : (
                 <tr>
-                  <td colSpan="6" className="py-8 text-center text-navy-500 font-semibold">
-                    Belum ada nilai yang diinput. Mulai dengan tombol di bawah.
+                  <td colSpan="4" className="py-8 text-center text-navy-500 font-semibold">
+                    Data siswa belum tersedia.
                   </td>
                 </tr>
               )}
             </tbody>
           </table>
-        </div>
-        <div className="mt-4 flex justify-end">
-          <Link to="/guru/input-nilai">
-            <button className="bg-navy-800 text-white font-bold text-xs px-4 py-2.5 rounded-lg hover:bg-navy-900 transition-all hover:scale-[1.01]">
-              Input Nilai Baru
-            </button>
-          </Link>
         </div>
       </Card>
     </div>

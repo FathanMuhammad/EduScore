@@ -9,16 +9,28 @@ import Button from '../../components/Button';
 import Input from '../../components/Input';
 import Badge from '../../components/Badge';
 import { Save, UserCheck, Calculator } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 
 export default function GuruInputNilai() {
   const { userData } = useAuth();
   const { siswa, addNilai } = useData();
   const { showToast } = useToast();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const queryNis = searchParams.get('nis');
 
   // Selected Student State
   const [selectedStudentId, setSelectedStudentId] = useState('');
+
+  // Pre-select student if NIS is provided in URL
+  React.useEffect(() => {
+    if (queryNis && siswa.length > 0) {
+      const student = siswa.find(s => s.nis === queryNis);
+      if (student) {
+        setSelectedStudentId(student.id);
+      }
+    }
+  }, [queryNis, siswa]);
   
   // Scores State
   const [tugas, setTugas] = useState('0');

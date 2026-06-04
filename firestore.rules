@@ -6,14 +6,16 @@ service cloud.firestore {
       allow read: if request.auth != null && 
         (request.auth.uid == uid || isAdmin());
       allow create: if request.auth != null && request.auth.uid == uid && request.resource.data.role != 'admin';
-      allow update, delete: if isAdmin();
+      allow update: if isAdmin() || (request.auth != null && request.auth.uid == uid && request.resource.data.role == resource.data.role && request.resource.data.status == resource.data.status);
+      allow delete: if isAdmin();
     }
 
     // siswa: admin & guru bisa CRUD, siswa hanya baca data sendiri dan create saat daftar
     match /siswa/{docId} {
       allow read: if request.auth != null;
       allow create: if request.auth != null && request.auth.uid == docId;
-      allow update, delete: if isAdmin();
+      allow update: if isAdmin() || (request.auth != null && request.auth.uid == docId);
+      allow delete: if isAdmin();
     }
 
     // guru: hanya admin CRUD

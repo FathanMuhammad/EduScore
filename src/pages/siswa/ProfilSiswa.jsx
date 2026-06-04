@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { db } from '../../lib/firebase';
-import { doc, getDoc, updateDoc } from 'firebase/firestore';
+import { doc, getDoc, updateDoc, setDoc } from 'firebase/firestore';
 import { useToast } from '../../context/ToastContext';
 import Input from '../../components/Input';
 import Button from '../../components/Button';
@@ -30,7 +30,7 @@ export default function ProfilSiswa() {
           setFormData({
             nis: data.nis || userData?.nis || '',
             nama: data.nama || userData?.nama || '',
-            kelas: data.kelas || 'Belum Ditentukan'
+            kelas: data.kelas || ''
           });
         }
       } catch (err) {
@@ -53,19 +53,19 @@ export default function ProfilSiswa() {
     try {
       // Update data di koleksi siswa
       const siswaRef = doc(db, 'siswa', currentUser.uid);
-      await updateDoc(siswaRef, {
+      await setDoc(siswaRef, {
         nis: formData.nis,
         nama: formData.nama,
         kelas: formData.kelas,
         updatedAt: new Date().toISOString()
-      });
+      }, { merge: true });
 
       // Update data di koleksi users agar sinkron
       const userRef = doc(db, 'users', currentUser.uid);
-      await updateDoc(userRef, {
+      await setDoc(userRef, {
         nis: formData.nis,
         nama: formData.nama
-      });
+      }, { merge: true });
 
       showToast("Profil berhasil diperbarui!", "success");
     } catch (err) {
