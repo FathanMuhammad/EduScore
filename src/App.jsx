@@ -19,6 +19,7 @@ import GuruInputNilai from './pages/guru/InputNilai';
 import GuruRekap from './pages/guru/Rekap';
 import SiswaDashboard from './pages/siswa/Dashboard';
 import SiswaNilaiPribadi from './pages/siswa/NilaiPribadi';
+import ProfilSiswa from './pages/siswa/ProfilSiswa';
 
 // Root Redirect Helper based on user role
 const RootRedirect = () => {
@@ -108,6 +109,11 @@ export default function App() {
                 <Route path="/siswa/nilai-pribadi" element={
                   <ProtectedRoute allowedRoles={['siswa']}>
                     <SiswaNilaiPribadi />
+                  </ProtectedRoute>
+                } />
+                <Route path="/siswa/profil" element={
+                  <ProtectedRoute allowedRoles={['siswa']}>
+                    <ProfilSiswa />
                   </ProtectedRoute>
                 } />
               </Route>

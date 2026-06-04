@@ -17,6 +17,8 @@ export default function Register() {
   const [password, setPassword] = useState('');
   const [role, setRole] = useState('siswa');
   const [nis, setNis] = useState('');
+  const [idGuru, setIdGuru] = useState('');
+  const [mataPelajaran, setMataPelajaran] = useState('');
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState({});
@@ -48,6 +50,10 @@ export default function Register() {
     if (role === 'siswa' && !nis) {
       newErrors.nis = 'NIS wajib diisi';
     }
+    if (role === 'guru') {
+      if (!idGuru) newErrors.idGuru = 'ID Guru wajib diisi';
+      if (!mataPelajaran) newErrors.mataPelajaran = 'Mata Pelajaran wajib diisi';
+    }
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -58,7 +64,7 @@ export default function Register() {
 
     setLoading(true);
     try {
-      const result = await register(email, password, nama, role, nis);
+      const result = await register(email, password, nama, role, nis, idGuru, mataPelajaran);
       if (result.requireApproval) {
         showToast('Pendaftaran berhasil! Akun Anda sedang menunggu persetujuan admin.', 'info');
         navigate('/login');
@@ -121,6 +127,43 @@ export default function Register() {
                 required
                 className="text-white"
               />
+            </div>
+          )}
+
+          {role === 'guru' && (
+            <div className="grid grid-cols-2 gap-4 animate-fade-in">
+              <div className="relative">
+                <Input
+                  id="idGuru"
+                  type="text"
+                  label="ID Guru"
+                  placeholder="Misal: G001"
+                  value={idGuru}
+                  onChange={(e) => {
+                    setIdGuru(e.target.value);
+                    if (errors.idGuru) setErrors({ ...errors, idGuru: '' });
+                  }}
+                  error={errors.idGuru}
+                  required
+                  className="text-white"
+                />
+              </div>
+              <div className="relative">
+                <Input
+                  id="mataPelajaran"
+                  type="text"
+                  label="Mata Pelajaran"
+                  placeholder="Misal: Matematika"
+                  value={mataPelajaran}
+                  onChange={(e) => {
+                    setMataPelajaran(e.target.value);
+                    if (errors.mataPelajaran) setErrors({ ...errors, mataPelajaran: '' });
+                  }}
+                  error={errors.mataPelajaran}
+                  required
+                  className="text-white"
+                />
+              </div>
             </div>
           )}
 

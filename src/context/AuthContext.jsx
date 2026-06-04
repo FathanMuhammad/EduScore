@@ -39,24 +39,17 @@ export const AuthProvider = ({ children }) => {
               setUserData(data);
             }
           } else {
-            // New user without a doc? Should not happen if they used our register function.
-            // If they signed up through Firebase console, default to 'siswa'
-            const defaultData = {
-              uid: user.uid,
-              email: user.email,
-              nama: user.displayName || user.email.split('@')[0],
-              role: 'siswa',
-              status: 'active'
-            };
-            await setDoc(userDocRef, defaultData);
-            setCurrentUser(user);
-            setUserRole('siswa');
-            setUserData(defaultData);
+            // User doc doesn't exist yet (might be in the middle of registration)
+            // We just set to null, register function will handle setting the state.
+            setCurrentUser(null);
+            setUserRole(null);
+            setUserData(null);
           }
         } catch (error) {
           console.error("Error fetching user data from Firestore:", error);
           setCurrentUser(null);
           setUserRole(null);
+          setUserData(null);
         }
       } else {
         setCurrentUser(null);
@@ -120,7 +113,7 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const register = async (email, password, nama, role, nis) => {
+  const register = async (email, password, nama, role, nis, idGuru, mataPelajaran) => {
     setLoading(true);
     try {
       const userCredential = await fbCreateUser(auth, email, password);
@@ -133,7 +126,8 @@ export const AuthProvider = ({ children }) => {
         nama: nama,
         role: role,
         status: status,
-        ...(role === 'siswa' && nis ? { nis } : {})
+        ...(role === 'siswa' && nis ? { nis } : {}),
+        ...(role === 'guru' ? { idGuru, mataPelajaran } : {})
       };
 
       const userDocRef = doc(db, 'users', user.uid);

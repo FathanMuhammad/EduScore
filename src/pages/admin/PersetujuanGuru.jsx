@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { db } from '../../lib/firebase';
-import { collection, query, where, onSnapshot, doc, updateDoc, deleteDoc } from 'firebase/firestore';
+import { collection, query, where, onSnapshot, doc, updateDoc, deleteDoc, setDoc } from 'firebase/firestore';
 import { useToast } from '../../context/ToastContext';
 import { UserCheck, XCircle, CheckCircle } from 'lucide-react';
 import Button from '../../components/Button';
@@ -34,11 +34,22 @@ export default function PersetujuanGuru() {
     return () => unsubscribe();
   }, [showToast]);
 
-  const handleApprove = async (id, nama) => {
+  const handleApprove = async (id, nama, idGuru, mataPelajaran) => {
     setActionLoading(id);
     try {
       const userRef = doc(db, 'users', id);
       await updateDoc(userRef, { status: 'active' });
+      
+      // Add to guru collection
+      const guruRef = doc(db, 'guru', id);
+      await setDoc(guruRef, {
+        idGuru: idGuru || `G${id.substring(0, 4).toUpperCase()}`,
+        namaGuru: nama,
+        mataPelajaran: mataPelajaran || 'Belum Ditentukan',
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      });
+
       showToast(`Akun guru ${nama} berhasil disetujui!`, 'success');
     } catch (err) {
       console.error(err);
@@ -117,7 +128,7 @@ export default function PersetujuanGuru() {
                     <td className="px-6 py-4 text-right space-x-2">
                       <Button
                         variant="primary"
-                        onClick={() => handleApprove(guru.id, guru.nama)}
+                        onClick={() => handleApprove(guru.id, guru.nama, guru.idGuru, guru.mataPelajaran)}
                         disabled={actionLoading === guru.id}
                         className="!px-3 !py-1.5 text-xs bg-emerald-600 hover:bg-emerald-700 focus:ring-emerald-500 text-white"
                       >

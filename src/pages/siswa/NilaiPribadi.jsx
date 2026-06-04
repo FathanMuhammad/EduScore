@@ -19,16 +19,12 @@ export default function SiswaNilaiPribadi() {
     return getNilaiBySiswaNis(studentNis);
   }, [getNilaiBySiswaNis, studentNis]);
 
-  const columns = [
     { key: 'no', label: 'No', sortable: false },
     { key: 'mataPelajaran', label: 'Mata Pelajaran', sortable: true },
     { key: 'namaGuru', label: 'Guru Pengampu', sortable: true },
     { key: 'tugas', label: 'Tugas (30%)', sortable: true },
     { key: 'uts', label: 'UTS (30%)', sortable: true },
-    { key: 'uas', label: 'UAS (40%)', sortable: true },
-    { key: 'nilaiAkhir', label: 'Nilai Akhir', sortable: true },
-    { key: 'status', label: 'Status Kelulusan', sortable: true },
-    { key: 'isValidated', label: 'Validasi', sortable: true }
+    { key: 'uas', label: 'UAS (40%)', sortable: true }
   ];
 
   if (loading) {
@@ -49,9 +45,8 @@ export default function SiswaNilaiPribadi() {
         <div className="text-xs font-semibold text-navy-700 leading-relaxed">
           <p className="font-bold text-navy-900 mb-1">Panduan Penilaian:</p>
           <ul className="list-disc pl-4 space-y-1">
-            <li>Nilai Akhir diperoleh dari kalkulasi: <strong>(30% x Tugas) + (30% x UTS) + (40% x UAS)</strong>.</li>
-            <li>Status Kelulusan per mata pelajaran dinyatakan <strong>Lulus</strong> jika Nilai Akhir mencapai minimal <strong>70</strong>.</li>
-            <li>Nilai berstatus <strong>Pending (Belum Valid)</strong> masih dalam proses review guru mata pelajaran dan belum dicatat dalam transkrip final.</li>
+            <li>Nilai yang tertera adalah komponen nilai mentah (Tugas, UTS, UAS).</li>
+            <li>Nilai akhir dan status kelulusan akan ditentukan oleh pihak sekolah di akhir semester.</li>
           </ul>
         </div>
       </div>
@@ -83,20 +78,6 @@ export default function SiswaNilaiPribadi() {
               <td className="px-6 py-4 text-sm text-center font-semibold text-navy-800 bg-navy-50/10">{item.tugas}</td>
               <td className="px-6 py-4 text-sm text-center font-semibold text-navy-800 bg-navy-50/20">{item.uts}</td>
               <td className="px-6 py-4 text-sm text-center font-semibold text-navy-800 bg-navy-50/30">{item.uas}</td>
-              <td className="px-6 py-4 text-sm font-black text-center text-navy-900 bg-navy-50/40">{item.nilaiAkhir}</td>
-              <td className="px-6 py-4">
-                <Badge status={item.status} />
-              </td>
-              <td className="px-6 py-4">
-                <span className={`
-                  inline-block px-2.5 py-0.5 rounded text-[10px] font-extrabold border uppercase tracking-wider
-                  ${item.isValidated 
-                    ? 'bg-emerald-50 text-emerald-700 border-emerald-200' 
-                    : 'bg-rose-50 text-rose-700 border-rose-200 animate-pulse'}
-                `}>
-                  {item.isValidated ? 'Valid' : 'Pending'}
-                </span>
-              </td>
             </tr>
           );
         }}
