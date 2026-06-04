@@ -73,9 +73,9 @@ export default function AdminDashboard() {
       </div>
 
       {/* Detailed Analysis Section */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="w-full">
         {/* Pass/Fail Breakdown Chart/Box */}
-        <Card title="Distribusi Kelulusan" subtitle="Perbandingan siswa yang lulus dan tidak lulus." className="lg:col-span-2">
+        <Card title="Distribusi Kelulusan" subtitle="Perbandingan siswa yang lulus dan tidak lulus." className="w-full">
           <div className="flex flex-col sm:flex-row items-center justify-around py-6 space-y-6 sm:space-y-0">
             {/* Visual circle gauge */}
             <div className="relative w-40 h-40 flex items-center justify-center">
@@ -126,27 +126,6 @@ export default function AdminDashboard() {
                 <span className="text-xs font-semibold text-navy-600">Total Data Input Nilai</span>
                 <span className="text-sm font-extrabold text-navy-900">{stats.total} Rekor</span>
               </div>
-            </div>
-          </div>
-        </Card>
-
-        {/* Recent Activity / System details */}
-        <Card title="Informasi Sistem" subtitle="Detail server dan database EduScore.">
-          <div className="space-y-4">
-            <div className="p-3 bg-navy-50/50 rounded-lg border border-navy-100 flex items-center justify-between">
-              <span className="text-xs font-bold text-navy-700">Tipe Database</span>
-              <span className="text-xs font-bold text-navy-600 bg-white px-2 py-1 rounded border border-navy-200">Firebase Firestore</span>
-            </div>
-            <div className="p-3 bg-navy-50/50 rounded-lg border border-navy-100 flex items-center justify-between">
-              <span className="text-xs font-bold text-navy-700">Mode Sinkronisasi</span>
-              <span className="text-xs font-bold text-emerald-600 bg-white px-2 py-1 rounded border border-navy-200 flex items-center">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1.5 animate-pulse" />
-                Realtime
-              </span>
-            </div>
-            <div className="p-3 bg-navy-50/50 rounded-lg border border-navy-100 flex items-center justify-between">
-              <span className="text-xs font-bold text-navy-700">Dukungan Framework</span>
-              <span className="text-xs font-bold text-navy-600 bg-white px-2 py-1 rounded border border-navy-200">React 19 + Vite</span>
             </div>
           </div>
         </Card>

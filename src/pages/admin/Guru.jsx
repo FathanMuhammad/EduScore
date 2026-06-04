@@ -7,6 +7,9 @@ import Input from '../../components/Input';
 import Table from '../../components/Table';
 import Modal from '../../components/Modal';
 import { Plus, Edit2, Trash2 } from 'lucide-react';
+import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { auth, db } from '../../lib/firebase';
+import { doc, setDoc } from 'firebase/firestore';
 
 export default function AdminGuru() {
   const { guru, addGuru, updateGuru, deleteGuru, loading } = useData();
@@ -21,6 +24,8 @@ export default function AdminGuru() {
   const [idGuru, setIdGuru] = useState('');
   const [namaGuru, setNamaGuru] = useState('');
   const [mataPelajaran, setMataPelajaran] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [errors, setErrors] = useState({});
 
   const validate = () => {
@@ -30,8 +35,12 @@ export default function AdminGuru() {
     if (!mataPelajaran.trim()) newErrors.mataPelajaran = 'Mata Pelajaran wajib diisi';
 
     // Check if ID Guru already exists in add mode
-    if (modalMode === 'add' && guru.some(g => g.idGuru === idGuru.trim())) {
-      newErrors.idGuru = 'ID Guru sudah terdaftar';
+    if (modalMode === 'add') {
+      if (!email.trim()) newErrors.email = 'Email wajib diisi';
+      if (!password.trim()) newErrors.password = 'Password wajib diisi';
+      if (guru.some(g => g.idGuru === idGuru.trim())) {
+        newErrors.idGuru = 'ID Guru sudah terdaftar';
+      }
     }
 
     setErrors(newErrors);
@@ -44,6 +53,8 @@ export default function AdminGuru() {
     setIdGuru('');
     setNamaGuru('');
     setMataPelajaran('');
+    setEmail('');
+    setPassword('');
     setErrors({});
     setIsModalOpen(true);
   };
@@ -54,6 +65,8 @@ export default function AdminGuru() {
     setIdGuru(item.idGuru || '');
     setNamaGuru(item.namaGuru || '');
     setMataPelajaran(item.mataPelajaran || '');
+    setEmail('');
+    setPassword('');
     setErrors({});
     setIsModalOpen(true);
   };
@@ -70,7 +83,30 @@ export default function AdminGuru() {
 
     try {
       if (modalMode === 'add') {
-        await addGuru(guruInstance.toFirestore());
+        // Create user in Auth
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        const user = userCredential.user;
+        
+        // Save to users collection
+        await setDoc(doc(db, 'users', user.uid), {
+          uid: user.uid,
+          email: user.email,
+          nama: namaGuru.trim(),
+          role: 'guru',
+          status: 'active', // Since Admin adds, status is directly active
+          idGuru: idGuru.trim(),
+          mataPelajaran: mataPelajaran.trim()
+        });
+
+        // Save to guru collection with UID as document ID
+        await setDoc(doc(db, 'guru', user.uid), {
+          idGuru: idGuru.trim(),
+          namaGuru: namaGuru.trim(),
+          mataPelajaran: mataPelajaran.trim(),
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString()
+        });
+
         showToast("Guru berhasil ditambahkan!", "success");
       } else {
         await updateGuru(selectedId, guruInstance.toFirestore());
@@ -78,6 +114,7 @@ export default function AdminGuru() {
       }
       setIsModalOpen(false);
     } catch (err) {
+      console.error(err);
       showToast("Gagal menyimpan data guru.", "error");
     }
   };
@@ -181,6 +218,30 @@ export default function AdminGuru() {
             error={errors.namaGuru}
             required
           />
+          {modalMode === 'add' && (
+            <>
+              <Input
+                id="email"
+                type="email"
+                label="Email"
+                placeholder="guru@sekolah.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                error={errors.email}
+                required
+              />
+              <Input
+                id="password"
+                type="text"
+                label="Password (Minimum 6 Karakter)"
+                placeholder="••••••••"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                error={errors.password}
+                required
+              />
+            </>
+          )}
           <Input
             id="mataPelajaran"
             label="Mata Pelajaran"

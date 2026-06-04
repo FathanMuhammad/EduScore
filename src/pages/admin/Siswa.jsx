@@ -8,7 +8,10 @@ import Input from '../../components/Input';
 import Table from '../../components/Table';
 import Modal from '../../components/Modal';
 import Badge from '../../components/Badge';
-import { Plus, Edit2, Trash2 } from 'lucide-react';
+import { Plus, Edit2, Trash2, Eye, EyeOff } from 'lucide-react';
+import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { auth, db } from '../../lib/firebase';
+import { doc, setDoc } from 'firebase/firestore';
 
 export default function AdminSiswa() {
   const { siswa, addSiswa, updateSiswa, deleteSiswa, loading: siswaLoading } = useSiswa();
@@ -23,6 +26,8 @@ export default function AdminSiswa() {
   const [nis, setNis] = useState('');
   const [nama, setNama] = useState('');
   const [kelas, setKelas] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [errors, setErrors] = useState({});
 
   const validate = () => {
@@ -31,8 +36,12 @@ export default function AdminSiswa() {
     if (!nama.trim()) newErrors.nama = 'Nama wajib diisi';
     if (!kelas.trim()) newErrors.kelas = 'Kelas wajib diisi';
 
-    if (modalMode === 'add' && siswa.some(s => s.nis === nis.trim())) {
-      newErrors.nis = 'NIS sudah terdaftar';
+    if (modalMode === 'add') {
+      if (!email.trim()) newErrors.email = 'Email wajib diisi';
+      if (!password.trim()) newErrors.password = 'Password wajib diisi';
+      if (siswa.some(s => s.nis === nis.trim())) {
+        newErrors.nis = 'NIS sudah terdaftar';
+      }
     }
 
     setErrors(newErrors);
@@ -45,6 +54,8 @@ export default function AdminSiswa() {
     setNis('');
     setNama('');
     setKelas('');
+    setEmail('');
+    setPassword('');
     setErrors({});
     setIsModalOpen(true);
   };
@@ -71,7 +82,29 @@ export default function AdminSiswa() {
 
     try {
       if (modalMode === 'add') {
-        await addSiswa(siswaInstance.toFirestore());
+        // Create user in Auth
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        const user = userCredential.user;
+
+        // Save to users collection
+        await setDoc(doc(db, 'users', user.uid), {
+          uid: user.uid,
+          email: user.email,
+          nama: nama.trim(),
+          role: 'siswa',
+          status: 'active',
+          nis: nis.trim()
+        });
+
+        // Save to siswa collection with UID as document ID
+        await setDoc(doc(db, 'siswa', user.uid), {
+          nis: nis.trim(),
+          nama: nama.trim(),
+          kelas: kelas.trim(),
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString()
+        });
+
         showToast("Siswa berhasil ditambahkan!", "success");
       } else {
         await updateSiswa(selectedId, siswaInstance.toFirestore());
@@ -207,10 +240,34 @@ export default function AdminSiswa() {
             error={errors.nama}
             required
           />
+          {modalMode === 'add' && (
+            <>
+              <Input
+                id="email"
+                type="email"
+                label="Email"
+                placeholder="nama@sekolah.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                error={errors.email}
+                required
+              />
+              <Input
+                id="password"
+                type="text"
+                label="Password (Minimum 6 Karakter)"
+                placeholder="••••••••"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                error={errors.password}
+                required
+              />
+            </>
+          )}
           <Input
             id="kelas"
             label="Kelas"
-            placeholder="Contoh: XII-RPL-1"
+            placeholder="Contoh: XII IPA 1"
             value={kelas}
             onChange={(e) => setKelas(e.target.value)}
             error={errors.kelas}
