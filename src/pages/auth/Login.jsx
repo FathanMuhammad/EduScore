@@ -133,29 +133,14 @@ export default function Login() {
           </Button>
         </form>
 
-        {/* Quick Logins for Testing */}
-        <div className="mt-8 pt-6 border-t border-white/10">
-          <p className="text-xs text-center font-bold tracking-wider text-navy-200 uppercase mb-3">Login Demo (Sandi: password123)</p>
-          <div className="grid grid-cols-3 gap-2">
-            <button
-              onClick={() => handleQuickLogin('admin@eduscore.com')}
-              className="px-2 py-2 text-[10px] font-bold text-white bg-indigo-900/40 hover:bg-indigo-900/60 border border-indigo-700/50 rounded-lg transition-all active:scale-95"
-            >
-              ADMIN
-            </button>
-            <button
-              onClick={() => handleQuickLogin('guru@eduscore.com')}
-              className="px-2 py-2 text-[10px] font-bold text-white bg-amber-900/40 hover:bg-amber-900/60 border border-amber-700/50 rounded-lg transition-all active:scale-95"
-            >
-              GURU
-            </button>
-            <button
-              onClick={() => handleQuickLogin('siswa@eduscore.com')}
-              className="px-2 py-2 text-[10px] font-bold text-white bg-emerald-900/40 hover:bg-emerald-900/60 border border-emerald-700/50 rounded-lg transition-all active:scale-95"
-            >
-              SISWA
-            </button>
-          </div>
+        {/* Register Link */}
+        <div className="mt-6 pt-6 border-t border-white/10 text-center">
+          <p className="text-sm text-navy-200">
+            Belum punya akun?{' '}
+            <a href="/register" className="text-white font-bold hover:underline">
+              Daftar di sini
+            </a>
+          </p>
         </div>
 
       </div>
