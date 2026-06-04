@@ -72,7 +72,7 @@ export default function Register() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-navy-900 via-navy-800 to-slate-900 p-4 font-sans">
       <div className="w-full max-w-md bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl shadow-2xl p-8 transition-all duration-300">
-        
+
         {/* Brand Header */}
         <div className="flex flex-col items-center justify-center mb-8">
           <div className="p-3 bg-white text-navy-900 rounded-2xl shadow-lg mb-3">
@@ -147,22 +147,20 @@ export default function Register() {
               <button
                 type="button"
                 onClick={() => setRole('siswa')}
-                className={`py-2 px-4 rounded-lg font-bold text-sm transition-all border ${
-                  role === 'siswa' 
-                    ? 'bg-emerald-600/90 text-white border-emerald-400 shadow-[0_0_15px_rgba(16,185,129,0.3)]' 
+                className={`py-2 px-4 rounded-lg font-bold text-sm transition-all border ${role === 'siswa'
+                    ? 'bg-emerald-600/90 text-white border-emerald-400 shadow-[0_0_15px_rgba(16,185,129,0.3)]'
                     : 'bg-navy-900/40 text-navy-200 border-navy-700/50 hover:bg-navy-800/60'
-                }`}
+                  }`}
               >
                 Siswa
               </button>
               <button
                 type="button"
                 onClick={() => setRole('guru')}
-                className={`py-2 px-4 rounded-lg font-bold text-sm transition-all border ${
-                  role === 'guru' 
-                    ? 'bg-amber-600/90 text-white border-amber-400 shadow-[0_0_15px_rgba(245,158,11,0.3)]' 
+                className={`py-2 px-4 rounded-lg font-bold text-sm transition-all border ${role === 'guru'
+                    ? 'bg-amber-600/90 text-white border-amber-400 shadow-[0_0_15px_rgba(245,158,11,0.3)]'
                     : 'bg-navy-900/40 text-navy-200 border-navy-700/50 hover:bg-navy-800/60'
-                }`}
+                  }`}
               >
                 Guru
               </button>
@@ -177,7 +175,7 @@ export default function Register() {
           <Button
             type="submit"
             variant="primary"
-            className="w-full py-2.5 mt-4 bg-white hover:bg-navy-50 text-navy-900 border border-transparent shadow-md hover:scale-[1.01]"
+            className="w-full py-2.5 mt-4 bg-navy-10 hover:bg-navy-50 text-navy-900 border border-transparent shadow-md hover:scale-[1.01]"
             loading={loading}
           >
             Daftar

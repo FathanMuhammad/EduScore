@@ -5,7 +5,8 @@ service cloud.firestore {
     match /users/{uid} {
       allow read: if request.auth != null && 
         (request.auth.uid == uid || isAdmin());
-      allow write: if isAdmin();
+      allow create: if request.auth != null && request.auth.uid == uid && request.resource.data.role != 'admin';
+      allow update, delete: if isAdmin();
     }
 
     // siswa: admin & guru bisa CRUD, siswa hanya baca data sendiri

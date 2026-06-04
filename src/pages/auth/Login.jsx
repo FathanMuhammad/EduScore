@@ -66,7 +66,7 @@ export default function Login() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-navy-900 via-navy-800 to-slate-900 p-4 font-sans">
       <div className="w-full max-w-md bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl shadow-2xl p-8 transition-all duration-300">
-        
+
         {/* Brand Header */}
         <div className="flex flex-col items-center justify-center mb-8">
           <div className="p-3 bg-white text-navy-900 rounded-2xl shadow-lg mb-3">
@@ -121,7 +121,7 @@ export default function Login() {
           <Button
             type="submit"
             variant="primary"
-            className="w-full py-2.5 mt-2 bg-white hover:bg-navy-50 text-navy-900 border border-transparent shadow-md hover:scale-[1.01]"
+            className="w-full py-2.5 mt-2 bg-navy-10 hover:bg-navy-50 text-navy-900 border border-transparent shadow-md hover:scale-[1.01]"
             loading={loading}
           >
             Masuk
