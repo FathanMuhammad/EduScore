@@ -1,0 +1,38 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // users hanya bisa baca data sendiri, admin bisa semua
+    match /users/{uid} {
+      allow read: if request.auth != null && 
+        (request.auth.uid == uid || isAdmin());
+      allow write: if isAdmin();
+    }
+
+    // siswa: admin & guru bisa CRUD, siswa hanya baca data sendiri
+    match /siswa/{docId} {
+      allow read: if request.auth != null;
+      allow write: if isAdmin();
+    }
+
+    // guru: hanya admin CRUD
+    match /guru/{docId} {
+      allow read: if request.auth != null;
+      allow write: if isAdmin();
+    }
+
+    // nilai: admin & guru bisa write, siswa hanya baca
+    match /nilai/{docId} {
+      allow read: if request.auth != null;
+      allow write: if isAdmin() || isGuru();
+    }
+
+    function isAdmin() {
+      return request.auth != null && 
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == "admin";
+    }
+    function isGuru() {
+      return request.auth != null && 
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == "guru";
+    }
+  }
+}
