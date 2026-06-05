@@ -34,20 +34,20 @@ export default function GuruInputNilai() {
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
 
-  // Pre-select student if NIS is provided in URL, and check for existing grades
+  // Pre-select student if NIS is provided in URL
   React.useEffect(() => {
-    let targetStudentId = selectedStudentId;
-
     if (queryNis && siswa.length > 0 && !selectedStudentId) {
       const student = siswa.find(s => s.nis === queryNis);
       if (student) {
-        targetStudentId = student.id;
         setSelectedStudentId(student.id);
       }
     }
+  }, [queryNis, siswa, selectedStudentId]);
 
-    if (targetStudentId) {
-      const studentObj = siswa.find(s => s.id === targetStudentId);
+  // When selectedStudentId changes, check for existing grades and populate
+  React.useEffect(() => {
+    if (selectedStudentId) {
+      const studentObj = siswa.find(s => s.id === selectedStudentId);
       if (studentObj) {
         const teacherGrades = getNilaiByGuru(teacherId);
         const existingGrade = teacherGrades.find(n => n.nis === studentObj.nis);
@@ -70,7 +70,9 @@ export default function GuruInputNilai() {
       setUAS('');
       setExistingNilaiId(null);
     }
-  }, [queryNis, siswa, selectedStudentId, getNilaiByGuru, teacherId]);
+    // Hanya jalankan ketika selectedStudentId berubah, agar tidak mengganggu saat guru mengetik
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedStudentId]);
 
   // Get selected student details
   const selectedStudent = siswa.find(s => s.id === selectedStudentId);
