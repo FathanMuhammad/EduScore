@@ -6,6 +6,8 @@ import Table from '../../components/Table';
 import Button from '../../components/Button';
 import Badge from '../../components/Badge';
 import { Printer, Filter, RefreshCw } from 'lucide-react';
+import jsPDF from 'jspdf';
+import 'jspdf-autotable';
 
 export default function AdminLaporan() {
   const { nilai, loading } = useNilai();
@@ -31,7 +33,47 @@ export default function AdminLaporan() {
   }, [filteredNilai]);
 
   const handlePrint = () => {
-    window.print();
+    const doc = new jsPDF('landscape');
+    
+    // Header text
+    doc.setFontSize(16);
+    doc.text('Laporan Hasil Penilaian Siswa (EduScore)', 14, 20);
+    
+    doc.setFontSize(11);
+    doc.text(`Kelas: ${selectedKelas || 'Semua Kelas'} | Tanggal Cetak: ${new Date().toLocaleDateString('id-ID')}`, 14, 28);
+    
+    // Define table columns
+    const tableColumn = ["No", "NIS", "Nama Siswa", "Kelas", "Mata Pelajaran", "Guru Pengampu", "Tugas", "UTS", "UAS", "Akhir", "Status", "Valid"];
+    
+    // Map data to rows
+    const tableRows = laporanData.map(item => [
+      item.no,
+      item.nis,
+      item.namaSiswa,
+      item.kelas,
+      item.mataPelajaran,
+      item.namaGuru,
+      item.tugas,
+      item.uts,
+      item.uas,
+      item.nilaiAkhir,
+      item.status,
+      item.isValidated
+    ]);
+    
+    // Generate table
+    doc.autoTable({
+      head: [tableColumn],
+      body: tableRows,
+      startY: 35,
+      theme: 'grid',
+      styles: { fontSize: 9, cellPadding: 2 },
+      headStyles: { fillColor: [30, 41, 59], textColor: 255 }, // navy-800
+      alternateRowStyles: { fillColor: [248, 250, 252] } // slate-50
+    });
+    
+    // Save PDF
+    doc.save(`Laporan_Nilai_${selectedKelas ? selectedKelas : 'Semua_Kelas'}.pdf`);
   };
 
   const columns = [
@@ -79,14 +121,6 @@ export default function AdminLaporan() {
         </div>
       </div>
 
-      {/* Print Only Header */}
-      <div className="hidden print:block text-center space-y-2 mb-8 border-b-2 border-navy-900 pb-4">
-        <h1 className="text-2xl font-black text-navy-900 uppercase">Laporan Hasil Penilaian Siswa (EduScore)</h1>
-        <p className="text-sm font-semibold text-navy-600">
-          Kelas: {selectedKelas || 'Semua Kelas'} | Tanggal Cetak: {new Date().toLocaleDateString('id-ID')}
-        </p>
-      </div>
-
       {/* Data Table */}
       <div className="print-table-container">
         <Table
@@ -122,20 +156,6 @@ export default function AdminLaporan() {
             </tr>
           )}
         />
-      </div>
-
-      {/* Print Footer */}
-      <div className="hidden print:flex justify-between items-center mt-12 text-xs font-semibold text-navy-500 px-6">
-        <div>
-          <p>Kepala Sekolah,</p>
-          <div className="h-16" />
-          <p className="font-bold border-t border-navy-400 pt-1 text-navy-800">Drs. H. Mulyono, M.Pd.</p>
-        </div>
-        <div>
-          <p>Admin Kurikulum,</p>
-          <div className="h-16" />
-          <p className="font-bold border-t border-navy-400 pt-1 text-navy-800">EduScore System</p>
-        </div>
       </div>
     </div>
   );
