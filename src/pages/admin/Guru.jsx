@@ -136,6 +136,42 @@ export default function AdminGuru() {
     }
   };
 
+  const handlePrint = () => {
+    const doc = new jsPDF('portrait');
+    
+    // Header text
+    doc.setFontSize(16);
+    doc.text('Daftar Tenaga Pengajar / Guru (EduScore)', 14, 20);
+    
+    doc.setFontSize(11);
+    doc.text(`Tanggal Cetak: ${new Date().toLocaleDateString('id-ID')}`, 14, 28);
+    
+    // Define table columns
+    const tableColumn = ["No", "ID Guru", "Nama Guru", "Mata Pelajaran"];
+    
+    // Map data to rows
+    const tableRows = guru.map((item, index) => [
+      index + 1,
+      item.idGuru,
+      item.namaGuru,
+      item.mataPelajaran
+    ]);
+    
+    // Generate table
+    autoTable(doc, {
+      head: [tableColumn],
+      body: tableRows,
+      startY: 35,
+      theme: 'grid',
+      styles: { fontSize: 10, cellPadding: 3 },
+      headStyles: { fillColor: [30, 41, 59], textColor: 255 }, // navy-800
+      alternateRowStyles: { fillColor: [248, 250, 252] } // slate-50
+    });
+    
+    // Save PDF
+    doc.save(`Daftar_Guru_${new Date().toISOString().slice(0, 10)}.pdf`);
+  };
+
   const columns = [
     { key: 'no', label: 'No', sortable: false },
     { key: 'idGuru', label: 'ID Guru', sortable: true },
@@ -152,9 +188,14 @@ export default function AdminGuru() {
           <h2 className="text-xl font-extrabold text-navy-900">Manajemen Guru</h2>
           <p className="text-xs text-navy-500 mt-1">Kelola data tenaga pengajar beserta spesifikasi mata pelajaran mereka.</p>
         </div>
-        <Button variant="primary" onClick={handleOpenAdd} icon={Plus}>
-          Tambah Guru
-        </Button>
+        <div className="flex items-center space-x-2">
+          <Button variant="secondary" onClick={handlePrint} icon={Printer}>
+            Cetak / PDF
+          </Button>
+          <Button variant="primary" onClick={handleOpenAdd} icon={Plus}>
+            Tambah Guru
+          </Button>
+        </div>
       </div>
 
       {/* Table Data */}
