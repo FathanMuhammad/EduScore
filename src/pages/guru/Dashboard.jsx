@@ -1,17 +1,22 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useData } from '../../context/DataContext';
 import useNilai from '../../hooks/useNilai';
 import Card from '../../components/Card';
 import Badge from '../../components/Badge';
 import Spinner from '../../components/Spinner';
-import { ClipboardPen, Award, CheckCircle, Clock, BookOpen } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import Modal from '../../components/Modal';
+import { ClipboardPen, Award, CheckCircle, Clock, BookOpen, AlertCircle } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
 
 export default function GuruDashboard() {
   const { userData } = useAuth();
   const { siswa } = useData();
   const { getNilaiByGuru, loading } = useNilai();
+  const navigate = useNavigate();
+
+  const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
+  const [selectedSiswaForEdit, setSelectedSiswaForEdit] = useState(null);
 
   const teacherId = userData?.idGuru || 'g1'; 
   const teacherName = userData?.nama || 'Guru';
@@ -36,6 +41,18 @@ export default function GuruDashboard() {
   if (loading) {
     return <Spinner size="lg" />;
   }
+
+  const handleOpenEdit = (siswaObj) => {
+    setSelectedSiswaForEdit(siswaObj);
+    setIsConfirmModalOpen(true);
+  };
+
+  const proceedToEdit = () => {
+    setIsConfirmModalOpen(false);
+    if (selectedSiswaForEdit) {
+      navigate(`/guru/input-nilai?nis=${selectedSiswaForEdit.nis || ''}&nama=${encodeURIComponent(selectedSiswaForEdit.nama || '')}`);
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -132,20 +149,32 @@ export default function GuruDashboard() {
             </thead>
             <tbody className="divide-y divide-navy-50">
               {siswa && siswa.length > 0 ? (
-                siswa.map((s) => (
-                  <tr key={s.id} className="hover:bg-navy-50/20 transition-colors">
-                    <td className="py-3.5 font-bold text-navy-800">{s.nis || 'N/A'}</td>
-                    <td className="py-3.5 font-semibold text-navy-900">{s.nama}</td>
-                    <td className="py-3.5 text-navy-600">{s.kelas || 'Belum Ditentukan'}</td>
-                    <td className="py-3.5 text-right">
-                      <Link to={`/guru/input-nilai?nis=${s.nis || ''}&nama=${encodeURIComponent(s.nama || '')}`}>
-                        <button className="bg-emerald-600 text-white font-bold text-xs px-3 py-1.5 rounded hover:bg-emerald-700 transition-all">
-                          Tambah Nilai
-                        </button>
-                      </Link>
-                    </td>
-                  </tr>
-                ))
+                siswa.map((s) => {
+                  const hasGrade = teacherGrades.some(g => g.nis === s.nis);
+                  return (
+                    <tr key={s.id} className="hover:bg-navy-50/20 transition-colors">
+                      <td className="py-3.5 font-bold text-navy-800">{s.nis || 'N/A'}</td>
+                      <td className="py-3.5 font-semibold text-navy-900">{s.nama}</td>
+                      <td className="py-3.5 text-navy-600">{s.kelas || 'Belum Ditentukan'}</td>
+                      <td className="py-3.5 text-right">
+                        {hasGrade ? (
+                          <button 
+                            onClick={() => handleOpenEdit(s)}
+                            className="bg-amber-500 text-white font-bold text-xs px-3 py-1.5 rounded hover:bg-amber-600 transition-all"
+                          >
+                            Ubah Nilai
+                          </button>
+                        ) : (
+                          <Link to={`/guru/input-nilai?nis=${s.nis || ''}&nama=${encodeURIComponent(s.nama || '')}`}>
+                            <button className="bg-emerald-600 text-white font-bold text-xs px-3 py-1.5 rounded hover:bg-emerald-700 transition-all">
+                              Tambah Nilai
+                            </button>
+                          </Link>
+                        )}
+                      </td>
+                    </tr>
+                  );
+                })
               ) : (
                 <tr>
                   <td colSpan="4" className="py-8 text-center text-navy-500 font-semibold">
@@ -157,6 +186,26 @@ export default function GuruDashboard() {
           </table>
         </div>
       </Card>
+
+      {/* Confirmation Edit Modal */}
+      <Modal
+        isOpen={isConfirmModalOpen}
+        onClose={() => setIsConfirmModalOpen(false)}
+        title="Konfirmasi Ubah Nilai"
+        onConfirm={proceedToEdit}
+        confirmText="Ya, Ubah"
+        confirmVariant="primary"
+        size="sm"
+      >
+        <div className="flex items-start space-x-3">
+          <div className="p-2 bg-amber-50 text-amber-600 rounded-lg flex-shrink-0">
+            <AlertCircle className="w-5 h-5" />
+          </div>
+          <p className="text-sm text-navy-700 leading-relaxed">
+            Siswa <strong>{selectedSiswaForEdit?.nama}</strong> sudah memiliki data nilai untuk mata pelajaran ini. Apakah Anda yakin ingin mengubah nilainya?
+          </p>
+        </div>
+      </Modal>
     </div>
   );
 }

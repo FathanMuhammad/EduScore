@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useData } from '../../context/DataContext';
+import useNilai from '../../hooks/useNilai';
 import { Guru } from '../../classes/Guru';
 import { validasiNilai } from '../../utils/validasi';
 import { useToast } from '../../context/ToastContext';
@@ -13,7 +14,8 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 
 export default function GuruInputNilai() {
   const { userData } = useAuth();
-  const { siswa, addNilai } = useData();
+  const { siswa, addNilai, updateNilai } = useData();
+  const { getNilaiByGuru } = useNilai();
   const { showToast } = useToast();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -21,23 +23,54 @@ export default function GuruInputNilai() {
 
   // Selected Student State
   const [selectedStudentId, setSelectedStudentId] = useState('');
+  const [existingNilaiId, setExistingNilaiId] = useState(null);
 
-  // Pre-select student if NIS is provided in URL
-  React.useEffect(() => {
-    if (queryNis && siswa.length > 0) {
-      const student = siswa.find(s => s.nis === queryNis);
-      if (student) {
-        setSelectedStudentId(student.id);
-      }
-    }
-  }, [queryNis, siswa]);
-  
+  const teacherId = userData?.idGuru || 'g1';
+
   // Scores State
   const [tugas, setTugas] = useState('');
   const [uts, setUTS] = useState('');
   const [uas, setUAS] = useState('');
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
+
+  // Pre-select student if NIS is provided in URL, and check for existing grades
+  React.useEffect(() => {
+    let targetStudentId = selectedStudentId;
+
+    if (queryNis && siswa.length > 0 && !selectedStudentId) {
+      const student = siswa.find(s => s.nis === queryNis);
+      if (student) {
+        targetStudentId = student.id;
+        setSelectedStudentId(student.id);
+      }
+    }
+
+    if (targetStudentId) {
+      const studentObj = siswa.find(s => s.id === targetStudentId);
+      if (studentObj) {
+        const teacherGrades = getNilaiByGuru(teacherId);
+        const existingGrade = teacherGrades.find(n => n.nis === studentObj.nis);
+        
+        if (existingGrade) {
+          setTugas(existingGrade.tugas.toString());
+          setUTS(existingGrade.uts.toString());
+          setUAS(existingGrade.uas.toString());
+          setExistingNilaiId(existingGrade.id);
+        } else {
+          setTugas('');
+          setUTS('');
+          setUAS('');
+          setExistingNilaiId(null);
+        }
+      }
+    } else {
+      setTugas('');
+      setUTS('');
+      setUAS('');
+      setExistingNilaiId(null);
+    }
+  }, [queryNis, siswa, selectedStudentId, getNilaiByGuru, teacherId]);
 
   // Get selected student details
   const selectedStudent = siswa.find(s => s.id === selectedStudentId);
@@ -86,12 +119,17 @@ export default function GuruInputNilai() {
       );
 
       // 3. Save to Firestore via DataContext
-      await addNilai(nilaiInstance.toFirestore());
-
-      showToast(`Nilai untuk ${selectedStudent.nama} berhasil disimpan!`, 'success');
+      if (existingNilaiId) {
+        await updateNilai(existingNilaiId, nilaiInstance.toFirestore());
+        showToast(`Nilai untuk ${selectedStudent.nama} berhasil diubah!`, 'success');
+      } else {
+        await addNilai(nilaiInstance.toFirestore());
+        showToast(`Nilai untuk ${selectedStudent.nama} berhasil disimpan!`, 'success');
+      }
       
       // Reset form
       setSelectedStudentId('');
+      setExistingNilaiId(null);
       setTugas('');
       setUTS('');
       setUAS('');
@@ -267,6 +305,7 @@ export default function GuruInputNilai() {
               variant="secondary"
               onClick={() => {
                 setSelectedStudentId('');
+                setExistingNilaiId(null);
                 setTugas('');
                 setUTS('');
                 setUAS('');
