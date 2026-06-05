@@ -6,10 +6,12 @@ import Button from '../../components/Button';
 import Input from '../../components/Input';
 import Table from '../../components/Table';
 import Modal from '../../components/Modal';
-import { Plus, Edit2, Trash2 } from 'lucide-react';
+import { Plus, Edit2, Trash2, Printer } from 'lucide-react';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { auth, db } from '../../lib/firebase';
 import { doc, setDoc } from 'firebase/firestore';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 
 export default function AdminGuru() {
   const { guru, addGuru, updateGuru, deleteGuru, loading } = useData();

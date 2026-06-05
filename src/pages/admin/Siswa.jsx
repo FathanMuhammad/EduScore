@@ -8,10 +8,12 @@ import Input from '../../components/Input';
 import Table from '../../components/Table';
 import Modal from '../../components/Modal';
 import Badge from '../../components/Badge';
-import { Plus, Edit2, Trash2, Eye, EyeOff } from 'lucide-react';
+import { Plus, Edit2, Trash2, Eye, EyeOff, Printer } from 'lucide-react';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { auth, db } from '../../lib/firebase';
 import { doc, setDoc } from 'firebase/firestore';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 
 export default function AdminSiswa() {
   const { siswa, addSiswa, updateSiswa, deleteSiswa, loading: siswaLoading } = useSiswa();
@@ -131,6 +133,44 @@ export default function AdminSiswa() {
     }
   };
 
+  const handlePrint = () => {
+    const doc = new jsPDF('portrait');
+    
+    // Header text
+    doc.setFontSize(16);
+    doc.text('Daftar Siswa dan Nilai Akumulasi (EduScore)', 14, 20);
+    
+    doc.setFontSize(11);
+    doc.text(`Tanggal Cetak: ${new Date().toLocaleDateString('id-ID')}`, 14, 28);
+    
+    // Define table columns
+    const tableColumn = ["No", "NIS", "Nama Siswa", "Kelas", "Rata-Rata Nilai Akhir", "Status Kelulusan"];
+    
+    // Map data to rows
+    const tableRows = tableData.map((item, index) => [
+      index + 1,
+      item.nis,
+      item.nama,
+      item.kelas,
+      item.calculatedNilaiAkhir,
+      item.calculatedStatus
+    ]);
+    
+    // Generate table
+    autoTable(doc, {
+      head: [tableColumn],
+      body: tableRows,
+      startY: 35,
+      theme: 'grid',
+      styles: { fontSize: 10, cellPadding: 3 },
+      headStyles: { fillColor: [30, 41, 59], textColor: 255 }, // navy-800
+      alternateRowStyles: { fillColor: [248, 250, 252] } // slate-50
+    });
+    
+    // Save PDF
+    doc.save(`Daftar_Siswa_${new Date().toISOString().slice(0, 10)}.pdf`);
+  };
+
   const columns = [
     { key: 'no', label: 'No', sortable: false },
     { key: 'nis', label: 'NIS', sortable: true },
@@ -168,9 +208,14 @@ export default function AdminSiswa() {
           <h2 className="text-xl font-extrabold text-navy-900">Manajemen Siswa</h2>
           <p className="text-xs text-navy-500 mt-1">Kelola biodata dan lihat nilai akumulasi rapor siswa.</p>
         </div>
-        <Button variant="primary" onClick={handleOpenAdd} icon={Plus}>
-          Tambah Siswa
-        </Button>
+        <div className="flex items-center space-x-2">
+          <Button variant="secondary" onClick={handlePrint} icon={Printer}>
+            Cetak / PDF
+          </Button>
+          <Button variant="primary" onClick={handleOpenAdd} icon={Plus}>
+            Tambah Siswa
+          </Button>
+        </div>
       </div>
 
       {/* Table Data */}
