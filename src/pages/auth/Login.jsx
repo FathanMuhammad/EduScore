@@ -56,6 +56,11 @@ export default function Login() {
     try {
       const user = await login(email, password);
       showToast(`Selamat datang kembali, ${user.nama || 'Pengguna'}!`, 'success');
+      if (password === 'password123') {
+        sessionStorage.setItem('needPasswordChange', 'true');
+      } else {
+        sessionStorage.removeItem('needPasswordChange');
+      }
     } catch (err) {
       showToast(err.message, 'error');
     } finally {
@@ -127,16 +132,6 @@ export default function Login() {
             Masuk
           </Button>
         </form>
-
-        {/* Register Link */}
-        <div className="mt-6 pt-6 border-t border-white/10 text-center">
-          <p className="text-sm text-navy-200">
-            Belum punya akun?{' '}
-            <a href="/register" className="text-white font-bold hover:underline">
-              Daftar di sini
-            </a>
-          </p>
-        </div>
 
       </div>
     </div>

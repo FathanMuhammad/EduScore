@@ -8,7 +8,7 @@ import Table from '../../components/Table';
 import Modal from '../../components/Modal';
 import { Plus, Edit2, Trash2, Printer } from 'lucide-react';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
-import { auth, db } from '../../lib/firebase';
+import { auth, db, firebaseConfig } from '../../lib/firebase';
 import { doc, setDoc } from 'firebase/firestore';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
@@ -56,7 +56,7 @@ export default function AdminGuru() {
     setNamaGuru('');
     setMataPelajaran('');
     setEmail('');
-    setPassword('');
+    setPassword('password123');
     setErrors({});
     setIsModalOpen(true);
   };
@@ -85,9 +85,14 @@ export default function AdminGuru() {
 
     try {
       if (modalMode === 'add') {
-        // Create user in Auth
-        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        // Create user in Auth using a secondary Firebase app to prevent signing out the admin
+        const { initializeApp } = await import('firebase/app');
+        const { getAuth } = await import('firebase/auth');
+        const secondaryApp = initializeApp(firebaseConfig, 'SecondaryGuru');
+        const secondaryAuth = getAuth(secondaryApp);
+        const userCredential = await createUserWithEmailAndPassword(secondaryAuth, email, password);
         const user = userCredential.user;
+        await secondaryApp.delete();
         
         // Save to users collection
         await setDoc(doc(db, 'users', user.uid), {
