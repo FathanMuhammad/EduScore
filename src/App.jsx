@@ -24,6 +24,7 @@ import GuruRekap from './pages/guru/Rekap';
 import SiswaDashboard from './pages/siswa/Dashboard';
 import SiswaNilaiPribadi from './pages/siswa/NilaiPribadi';
 import ProfilSiswa from './pages/siswa/ProfilSiswa';
+import ProfilGuru from './pages/guru/ProfilGuru';
 
 // Root Redirect Helper based on user role
 const RootRedirect = () => {
@@ -42,15 +43,45 @@ const AppLayout = () => {
   const [error, setError] = useState('');
 
   useEffect(() => {
-    const needChange = sessionStorage.getItem('needPasswordChange') === 'true';
-    if (needChange && currentUser) {
-      setShowPrompt(true);
-    }
+    const checkPasswordStatus = async () => {
+      const needChange = sessionStorage.getItem('needPasswordChange') === 'true';
+      if (needChange && currentUser) {
+        try {
+          const { doc, getDoc } = await import('firebase/firestore');
+          const { db } = await import('./lib/firebase');
+          const userDoc = await getDoc(doc(db, 'users', currentUser.uid));
+          if (userDoc.exists()) {
+            const data = userDoc.data();
+            if (data.declinePasswordChange) {
+              sessionStorage.setItem('needPasswordChange', 'declined');
+              setShowPrompt(false);
+              return;
+            }
+          }
+          setShowPrompt(true);
+        } catch (err) {
+          console.error("Gagal mengecek status password:", err);
+          setShowPrompt(true);
+        }
+      }
+    };
+    checkPasswordStatus();
   }, [currentUser]);
 
-  const handleDecline = () => {
+  const handleDecline = async () => {
     sessionStorage.setItem('needPasswordChange', 'declined');
     setShowPrompt(false);
+    if (currentUser) {
+      try {
+        const { doc, setDoc } = await import('firebase/firestore');
+        const { db } = await import('./lib/firebase');
+        const userRef = doc(db, 'users', currentUser.uid);
+        await setDoc(userRef, { declinePasswordChange: true }, { merge: true });
+        showToast('Keputusan disimpan. Anda tidak akan ditanya lagi.', 'info');
+      } catch (err) {
+        console.error("Gagal menyimpan keputusan ubah password:", err);
+      }
+    }
   };
 
   const handleAccept = () => {
@@ -111,7 +142,7 @@ const AppLayout = () => {
         size="sm"
       >
         <p className="text-sm text-slate-600">
-          Anda saat ini menggunakan password default (**password123**). Keamanan akun Anda berisiko. Apakah Anda ingin mengubah password Anda sekarang?
+          Anda saat ini menggunakan password default. Keamanan akun Anda berisiko. Apakah Anda ingin mengubah password Anda sekarang?
         </p>
       </Modal>
 
@@ -215,6 +246,11 @@ export default function App() {
                 <Route path="/guru/rekap" element={
                   <ProtectedRoute allowedRoles={['guru']}>
                     <GuruRekap />
+                  </ProtectedRoute>
+                } />
+                <Route path="/guru/profil" element={
+                  <ProtectedRoute allowedRoles={['guru']}>
+                    <ProfilGuru />
                   </ProtectedRoute>
                 } />
 

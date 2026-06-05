@@ -1,50 +1,51 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { db, auth } from '../../lib/firebase';
-import { doc, getDoc, updateDoc, setDoc } from 'firebase/firestore';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { useToast } from '../../context/ToastContext';
 import Input from '../../components/Input';
 import Button from '../../components/Button';
 import { Save } from 'lucide-react';
 import { updatePassword } from 'firebase/auth';
 
-export default function ProfilSiswa() {
+export default function ProfilGuru() {
   const { currentUser, userData } = useAuth();
   const { showToast } = useToast();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-
-  const [formData, setFormData] = useState({
-    nis: '',
-    nama: '',
-    kelas: ''
-  });
-
+  
+  // Password state
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [passwordSaving, setPasswordSaving] = useState(false);
 
+  const [formData, setFormData] = useState({
+    idGuru: '',
+    namaGuru: '',
+    mataPelajaran: ''
+  });
+
   useEffect(() => {
-    const fetchSiswaData = async () => {
+    const fetchGuruData = async () => {
       if (!currentUser?.uid) return;
       try {
-        const docRef = doc(db, 'siswa', currentUser.uid);
+        const docRef = doc(db, 'guru', currentUser.uid);
         const docSnap = await getDoc(docRef);
         if (docSnap.exists()) {
           const data = docSnap.data();
           setFormData({
-            nis: data.nis || userData?.nis || '',
-            nama: data.nama || userData?.nama || '',
-            kelas: data.kelas || ''
+            idGuru: data.idGuru || userData?.idGuru || '',
+            namaGuru: data.namaGuru || userData?.nama || '',
+            mataPelajaran: data.mataPelajaran || userData?.mataPelajaran || ''
           });
         }
       } catch (err) {
-        console.error("Gagal mengambil data siswa:", err);
+        console.error("Gagal mengambil data guru:", err);
       } finally {
         setLoading(false);
       }
     };
-    fetchSiswaData();
+    fetchGuruData();
   }, [currentUser, userData]);
 
   const handleChange = (e) => {
@@ -56,20 +57,17 @@ export default function ProfilSiswa() {
     e.preventDefault();
     setSaving(true);
     try {
-      // Update data di koleksi siswa
-      const siswaRef = doc(db, 'siswa', currentUser.uid);
-      await setDoc(siswaRef, {
-        nis: formData.nis,
-        nama: formData.nama,
-        kelas: formData.kelas,
+      // Update data in guru collection
+      const guruRef = doc(db, 'guru', currentUser.uid);
+      await setDoc(guruRef, {
+        namaGuru: formData.namaGuru,
         updatedAt: new Date().toISOString()
       }, { merge: true });
 
-      // Update data di koleksi users agar sinkron
+      // Update data in users collection for synchronization
       const userRef = doc(db, 'users', currentUser.uid);
       await setDoc(userRef, {
-        nis: formData.nis,
-        nama: formData.nama
+        nama: formData.namaGuru
       }, { merge: true });
 
       showToast("Profil berhasil diperbarui!", "success");
@@ -133,49 +131,29 @@ export default function ProfilSiswa() {
       <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
         <form onSubmit={handleSubmit} className="space-y-4">
           <Input
-            id="nis"
-            name="nis"
-            label="Nomor Induk Siswa (NIS)"
-            value={formData.nis}
+            id="idGuru"
+            name="idGuru"
+            label="ID Guru (NIP/Kode)"
+            value={formData.idGuru}
+            disabled
+            required
+          />
+          <Input
+            id="namaGuru"
+            name="namaGuru"
+            label="Nama Lengkap"
+            value={formData.namaGuru}
             onChange={handleChange}
             required
           />
           <Input
-            id="nama"
-            name="nama"
-            label="Nama Lengkap"
-            value={formData.nama}
-            onChange={handleChange}
+            id="mataPelajaran"
+            name="mataPelajaran"
+            label="Mata Pelajaran"
+            value={formData.mataPelajaran}
+            disabled
             required
           />
-          <div className="flex flex-col space-y-1.5 w-full">
-            <label className="text-xs font-semibold text-navy-800 flex items-center">
-              Kelas
-              <span className="text-rose-500 ml-0.5">*</span>
-            </label>
-            <select
-              id="kelas"
-              name="kelas"
-              value={formData.kelas}
-              onChange={handleChange}
-              required
-              className="w-full px-3.5 py-2 text-sm rounded-lg border bg-white text-navy-900 border-navy-200 focus:border-navy-500 focus:ring-navy-100 focus:ring-2 focus:ring-offset-0 transition-all duration-200 outline-none hover:border-navy-300"
-            >
-              <option value="">-- Pilih Kelas --</option>
-              <option value="X IPA 1">X IPA 1</option>
-              <option value="X IPA 2">X IPA 2</option>
-              <option value="X IPS 1">X IPS 1</option>
-              <option value="X IPS 2">X IPS 2</option>
-              <option value="XI IPA 1">XI IPA 1</option>
-              <option value="XI IPA 2">XI IPA 2</option>
-              <option value="XI IPS 1">XI IPS 1</option>
-              <option value="XI IPS 2">XI IPS 2</option>
-              <option value="XII IPA 1">XII IPA 1</option>
-              <option value="XII IPA 2">XII IPA 2</option>
-              <option value="XII IPS 1">XII IPS 1</option>
-              <option value="XII IPS 2">XII IPS 2</option>
-            </select>
-          </div>
 
           <div className="pt-4">
             <Button
@@ -197,7 +175,7 @@ export default function ProfilSiswa() {
       </div>
 
       {/* Password Change Card */}
-      <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6 mt-6">
+      <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
         <h3 className="text-lg font-bold text-slate-800 mb-4">Ubah Password</h3>
         <form onSubmit={handlePasswordChange} className="space-y-4">
           <Input

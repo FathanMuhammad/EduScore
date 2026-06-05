@@ -48,6 +48,7 @@ export default function Sidebar() {
           { to: '/guru/dashboard', label: 'Dashboard Guru', icon: LayoutDashboard },
           { to: '/guru/input-nilai', label: 'Input Nilai Siswa', icon: ClipboardPen },
           { to: '/guru/rekap', label: 'Rekap Nilai', icon: FileSpreadsheet },
+          { to: '/guru/profil', label: 'Profil Saya', icon: User },
         ];
       case 'siswa':
         return [
