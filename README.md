@@ -1,4 +1,4 @@
-# EduScore 🎓
+# EduScore
 
 EduScore adalah sebuah aplikasi Sistem Informasi Akademik berbasis *web* yang dirancang khusus untuk mempermudah sekolah dalam mengelola, memantau, dan mendistribusikan nilai siswa secara digital dan *real-time*.
 
