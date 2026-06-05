@@ -12,7 +12,7 @@ import { Check, Trash2, ShieldAlert } from 'lucide-react';
 
 export default function GuruRekap() {
   const { userData } = useAuth();
-  const { updateNilai, deleteNilai } = useData();
+  const { updateNilai, deleteNilai, siswa } = useData();
   const { getNilaiByGuru, loading } = useNilai();
   const { showToast } = useToast();
 
@@ -21,10 +21,17 @@ export default function GuruRekap() {
 
   const teacherId = userData?.idGuru || 'g1';
 
-  // Get only grades matching this teacher
+  // Get only grades matching this teacher and enrich with student's current class
   const teacherGrades = useMemo(() => {
-    return getNilaiByGuru(teacherId);
-  }, [getNilaiByGuru, teacherId]);
+    const rawGrades = getNilaiByGuru(teacherId);
+    return rawGrades.map(item => {
+      const student = siswa.find(s => s.nis === item.nis);
+      return {
+        ...item,
+        kelas: student?.kelas || item.kelas || 'Belum Ditentukan'
+      };
+    });
+  }, [getNilaiByGuru, teacherId, siswa]);
 
   const handleValidate = async (item) => {
     try {

@@ -7,30 +7,35 @@ import Button from '../../components/Button';
 import Badge from '../../components/Badge';
 import { Printer, Filter, RefreshCw } from 'lucide-react';
 import jsPDF from 'jspdf';
-import 'jspdf-autotable';
+import autoTable from 'jspdf-autotable';
 
 export default function AdminLaporan() {
   const { nilai, loading } = useNilai();
-  const { getUniqueKelas } = useSiswa();
+  const { siswa, getUniqueKelas } = useSiswa();
 
   const [selectedKelas, setSelectedKelas] = useState('');
 
-  // Extract unique classes for filtering
+  // Extract unique classes for filtering directly from siswa
   const kelasList = useMemo(() => {
-    const list = nilai.map(n => n.kelas).filter(Boolean);
-    return [...new Set(list)];
-  }, [nilai]);
+    return getUniqueKelas();
+  }, [getUniqueKelas]);
 
-  // Filtered grades
-  const filteredNilai = useMemo(() => {
-    if (!selectedKelas) return nilai;
-    return nilai.filter(n => n.kelas === selectedKelas);
-  }, [nilai, selectedKelas]);
+  // Transform data using generateLaporan and enrich with real class from siswa collection
+  const laporanDataRaw = useMemo(() => {
+    return generateLaporan(nilai).map(item => {
+      const student = siswa.find(s => s.nis === item.nis);
+      return {
+        ...item,
+        kelas: student?.kelas || item.kelas || 'Belum Ditentukan'
+      };
+    });
+  }, [nilai, siswa]);
 
-  // Transform data using generateLaporan utility
+  // Filtered grades based on the enriched data
   const laporanData = useMemo(() => {
-    return generateLaporan(filteredNilai);
-  }, [filteredNilai]);
+    if (!selectedKelas) return laporanDataRaw;
+    return laporanDataRaw.filter(n => n.kelas === selectedKelas);
+  }, [laporanDataRaw, selectedKelas]);
 
   const handlePrint = () => {
     const doc = new jsPDF('landscape');
@@ -62,7 +67,7 @@ export default function AdminLaporan() {
     ]);
     
     // Generate table
-    doc.autoTable({
+    autoTable(doc, {
       head: [tableColumn],
       body: tableRows,
       startY: 35,
