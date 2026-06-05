@@ -33,9 +33,9 @@ export default function GuruInputNilai() {
   }, [queryNis, siswa]);
   
   // Scores State
-  const [tugas, setTugas] = useState('0');
-  const [uts, setUTS] = useState('0');
-  const [uas, setUAS] = useState('0');
+  const [tugas, setTugas] = useState('');
+  const [uts, setUTS] = useState('');
+  const [uas, setUAS] = useState('');
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
 
@@ -92,9 +92,9 @@ export default function GuruInputNilai() {
       
       // Reset form
       setSelectedStudentId('');
-      setTugas('0');
-      setUTS('0');
-      setUAS('0');
+      setTugas('');
+      setUTS('');
+      setUAS('');
       setErrors({});
       
       // Redirect to rekap
@@ -267,9 +267,9 @@ export default function GuruInputNilai() {
               variant="secondary"
               onClick={() => {
                 setSelectedStudentId('');
-                setTugas('0');
-                setUTS('0');
-                setUAS('0');
+                setTugas('');
+                setUTS('');
+                setUAS('');
                 setErrors({});
               }}
               disabled={loading}
