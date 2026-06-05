@@ -14,6 +14,8 @@ export default function AdminDashboard() {
     return <Spinner size="lg" />;
   }
 
+  const totalSiswa = siswa.length;
+
   // Calculate distinct student metrics based on user requirements
   const studentMetrics = React.useMemo(() => {
     let passedCount = 0;
