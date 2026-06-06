@@ -88,7 +88,7 @@ export default function Login() {
               id="email"
               type="email"
               label="Email"
-              placeholder="nama@sekolah.com"
+              placeholder="nama@gmail.com"
               value={email}
               onChange={(e) => {
                 setEmail(e.target.value);
@@ -97,6 +97,7 @@ export default function Login() {
               error={errors.email}
               required
               className="text-white"
+              labelClassName="text-white"
             />
           </div>
 
@@ -112,6 +113,7 @@ export default function Login() {
             }}
             error={errors.password}
             required
+            labelClassName="text-white"
             rightElement={
               <button
                 type="button"
@@ -133,6 +135,25 @@ export default function Login() {
             Masuk
           </Button>
         </form>
+
+        {/* Demo Credentials Info */}
+        <div className="mt-6 pt-4 border-t border-white/10 text-left">
+          <p className="text-[10px] text-navy-300 font-bold tracking-wider uppercase mb-2">Akun:</p>
+          <div className="text-[11px] text-navy-200 space-y-1 font-mono">
+            <p className="flex justify-between">
+              <span>admin@eduscore.com</span>
+              <span>password123 <span className="text-navy-300 font-sans font-bold">(admin)</span></span>
+            </p>
+            <p className="flex justify-between">
+              <span>abdul@gmail.com</span>
+              <span>password123 <span className="text-navy-300 font-sans font-bold">(guru)</span></span>
+            </p>
+            <p className="flex justify-between">
+              <span>fathan@gmail.com</span>
+              <span>password123 <span className="text-navy-300 font-sans font-bold">(siswa)</span></span>
+            </p>
+          </div>
+        </div>
 
       </div>
     </div>

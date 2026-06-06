@@ -15,12 +15,13 @@ export default function Input({
   max,
   step,
   rightElement,
+  labelClassName = '',
   ...props
 }) {
   return (
     <div className={`flex flex-col space-y-1.5 w-full ${className}`}>
       {label && (
-        <label htmlFor={id} className="text-xs font-semibold text-navy-800 flex items-center">
+        <label htmlFor={id} className={`text-xs font-semibold flex items-center ${labelClassName || 'text-navy-800'}`}>
           {label}
           {required && <span className="text-rose-500 ml-0.5">*</span>}
         </label>
