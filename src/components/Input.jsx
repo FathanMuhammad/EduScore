@@ -14,6 +14,7 @@ export default function Input({
   min,
   max,
   step,
+  rightElement,
   ...props
 }) {
   return (
@@ -39,6 +40,7 @@ export default function Input({
           className={`
             w-full px-3.5 py-2 text-sm rounded-lg border bg-white text-navy-900 transition-all duration-200 outline-none
             focus:ring-2 focus:ring-offset-0
+            ${rightElement ? 'pr-10' : ''}
             ${error 
               ? 'border-rose-300 focus:border-rose-500 focus:ring-rose-200' 
               : 'border-navy-200 focus:border-navy-500 focus:ring-navy-100'}
@@ -46,6 +48,11 @@ export default function Input({
           `}
           {...props}
         />
+        {rightElement && (
+          <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center z-10">
+            {rightElement}
+          </div>
+        )}
       </div>
       {error && (
         <span className="text-xs font-medium text-rose-500 animate-slide-down">
